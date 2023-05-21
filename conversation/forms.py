@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import Conversation, ConversationMessage
+from .models import ConversationMessage
 
 class ConversationMessageForm(forms.ModelForm):
     class Meta:

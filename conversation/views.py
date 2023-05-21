@@ -1,9 +1,9 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 
 from item.models import Item
 
 from .forms import ConversationMessageForm 
-from .models import Conversation, ConversationMessage
+from .models import Conversation
 
 def new_conversation(request, item_pk):
     item = get_object_or_404(Item, pk=item_pk)
@@ -31,6 +31,7 @@ def new_conversation(request, item_pk):
             conversation_message = form.save(commit=False)
             conversation_message.conversation = conversation
             conversation_message.created_by = request.user
+            conversation_message.save()
 
             return redirect('item:detail', pk=item_pk)
         
