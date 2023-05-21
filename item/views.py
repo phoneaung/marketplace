@@ -1,9 +1,31 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
-
+from django.db.models import Q 
 from .forms import NewItemForm, EditItemForm
-from .models import Item
+from .models import Item, Category
 
+
+# let user search the items
+def items(request):
+    query = request.GET.get('query')
+    items = Item.objects.filter(is_sold=False)
+    category_id = request.GET.get('category', 0)
+    categories = Category.objects.all()
+
+    if category_id:
+        items = items.filter(category_id=category_id)
+
+    if query:
+        items = items.filter(Q(name__icontains=query) | Q(description__icontains=query))
+
+    return render(request, 'item/items.html', {
+        'items': items,
+        'query': query,
+        'categories': categories,
+        'category_id': int(category_id)
+    })
+
+# show the details of an item
 def detail(request, pk):
     item = get_object_or_404(Item, pk=pk)
     related_items = Item.objects.filter(category=item.category, is_sold=False).exclude(pk=pk)[0:3]
@@ -13,6 +35,7 @@ def detail(request, pk):
         'related_items': related_items
     })
 
+# create a new listing item
 @login_required
 def new(request):
     if request.method == 'POST':
@@ -40,6 +63,7 @@ def delete(request, pk):
 
     return redirect('dashboard:index')
 
+# let the user edit the item's descriptions and stuff
 @login_required
 def edit(request, pk):
     item =  get_object_or_404(Item, pk=pk, created_by=request.user)
