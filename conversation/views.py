@@ -20,8 +20,8 @@ def new_conversation(request, item_pk):
 
     # if there is a conversation with the owner/user already, then redirect to that conversation page
     if conversations:
-        pass # redirect to conversation
-
+        return redirect('conversation:detail', pk=conversations.first().id)
+    
     if request.method == 'POST':
         form = ConversationMessageForm(request.POST)
         
