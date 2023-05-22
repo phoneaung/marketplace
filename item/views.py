@@ -6,6 +6,7 @@ from .models import Item, Category
 
 
 # let user search the items
+@login_required
 def items(request):
     query = request.GET.get('query')
     items = Item.objects.filter(is_sold=False)
@@ -25,7 +26,9 @@ def items(request):
         'category_id': int(category_id)
     })
 
+
 # show the details of an item
+@login_required
 def detail(request, pk):
     item = get_object_or_404(Item, pk=pk)
     related_items = Item.objects.filter(category=item.category, is_sold=False).exclude(pk=pk)[0:3]
@@ -34,6 +37,7 @@ def detail(request, pk):
         'item': item,
         'related_items': related_items
     })
+
 
 # create a new listing item
 @login_required
@@ -56,12 +60,14 @@ def new(request):
         'title': 'New item',
     })
 
+
 @login_required
 def delete(request, pk):
     item =  get_object_or_404(Item, pk=pk, created_by=request.user)
     item.delete()
 
     return redirect('dashboard:index')
+
 
 # let the user edit the item's descriptions and stuff
 @login_required

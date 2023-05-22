@@ -1,9 +1,13 @@
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import auth
 from django.shortcuts import render, redirect 
 
 from item.models import Category, Item
 
 from .forms import SignupForm
 
+
+@login_required
 def index(request):
     items = Item.objects.filter(is_sold=False)[0:6]
     categories = Category.objects.all()
@@ -13,8 +17,11 @@ def index(request):
         'categories': categories
     })
 
+
+@login_required
 def contact(request):
     return render(request, 'core/contact.html')
+
 
 def signup(request):
     if request.method == 'POST':
@@ -31,5 +38,11 @@ def signup(request):
     return render(request, 'core/signup.html', {
         'form': form
     })
+
+
+@login_required
+def logout(request):
+    auth.logout(request)
+    return redirect('core:login')
 
 
